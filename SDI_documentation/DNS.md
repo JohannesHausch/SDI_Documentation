@@ -1,0 +1,3 @@
+# DNS
+
+## Was ist DNS?
