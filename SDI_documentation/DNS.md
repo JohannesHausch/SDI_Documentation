@@ -83,8 +83,194 @@ zone "75.62.141.in-addr.arpa"{
 
 ```
 
-Now you need to create the zone file. We do this by copying the template:
+Now you need to create the zone files. We do this by copying the templates:
 
 ```sh
-cp /etc/bind/db.empty /etc/bind/Zones/db.mi.hdm-stuttgart.de
+$ cp /etc/bind/db.127 /etc/bind/Zones/reverse.mi.hdm-stuttgart.de
+$ cp /etc/bind/db.local /etc/bind/Zones/forward.mi.hdm-stuttgart.de
+```
+
+#### Forward zone
+
+The unedited template file for forward-zone looks like this:
+
+```sh
+$TTL    604800
+@       IN      SOA     localhost. root.localhost. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL~
+;
+@       IN      NS      localhost.
+@       IN      A       127.0.0.1
+@       IN      AAAA    ::1
+```
+
+First we need to specify the SOA (start-of-Authority).
+For this, we need to replace the `localhost.` with our primary name server : `ns1.sdi4.mi.hdm-stuttgart.de.`. **Take care to include the dot at the end.**
+
+You can freely choose the name of the name server, we decided to name our server "ns1".
+
+1. We need to edit the NS (nameserver) record to match our name server. So we replace `localhost.` with our primary nameserver address: `ns1.sdi4.mi.hdm-stuttgart.de.`.
+2. We need to define an address-record to be able to get the coresponding IP address to our nameserver `ns1`. To achieve this, we need to add this line: `ns1  IN  A   141.62.75.104`
+3. Now we need to specify our domain names to their coresponding IP addresses. For us its:
+
+```
+sdi04a.sdi4.mi.hdm-stuttgart.de IN      A       141.62.75.104
+sdi04b.sdi4.mi.hdm-stuutagrt.de IN      A       141.62.75.118
+```
+
+Finally it should look like this:
+
+```
+$TTL    604800
+@       IN      SOA     ns1.sdi4.mi.hdm-stuttgart.de. root.ns1.sdi4.mi.hdm-stuttgart.de. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      ns1.sdi4.mi.hdm-stuttgart.de.
+ns1     IN      A       141.62.75.104
+sdi04a.sdi4.mi.hdm-stuttgart.de IN      A       141.62.75.104
+sdi04b.sdi4.mi.hdm-stuutagrt.de IN      A       141.62.75.118
+@       IN      A       127.0.0.1
+@       IN      AAAA    ::1
+```
+
+#### Reverse zone
+
+The unedited template file for reverse-zone looks like this:
+
+```
+$TTL    604800
+@       IN      SOA     localhost. root.localhost. (
+                              1         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      localhost.
+1.0.0   IN      PTR     localhost.
+```
+
+The changes we need to make are mostly the same as the ones above.
+
+First we need to specify the SOA (start-of-Authority).
+For this, we need to replace the `localhost.` with our primary name server : `ns1.sdi4.mi.hdm-stuttgart.de.`. **Take care to include the dot at the end.**
+
+1. We need to edit the NS (nameserver) record to match our name server. So we replace `localhost.` with our primary nameserver address: `ns1.sdi4.mi.hdm-stuttgart.de.`
+
+2. Now we need to specify our IP adresses to their coresponding Domain names. For us its:
+
+```
+141.62.75.104   IN      PTR     sdi04a.mi.hdm-stuttgart.de.
+141.62.75.118   IN      PTR     sdi04b.mi.hdm-stuttgart.de.
+```
+
+3. We need to define an address-record to be able to get the coresponding IP address to our nameserver `ns1`. To achieve this, we need to add this line: `ns1  IN  A   141.62.75.104`
+
+Finally it should look like this:
+
+```
+@       IN      SOA     ns1.sdi4.mi.hdm-stuttgart.de. root.ns1.sdi4.mi.hdm-stuttgart.de. (
+                              1         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      ns1.sdi4.mi.hdm-stuttgart.de.
+141.62.75.104   IN      PTR     sdi04a.mi.hdm-stuttgart.de.
+141.62.75.118   IN      PTR     sdi04b.mi.hdm-stuttgart.de.
+ns1     IN      A       141.62.75.104
+```
+
+#### Edit `resolve.conf`
+
+Last but not least we need to edit the resolve.conf. It looks like this after editing:
+
+```sh
+# --- BEGIN PVE ---
+search sdi4.mi.hdm-stuttgart.de
+ns1 141.62.75.104
+# --- END PVE ---
+```
+
+After u are done with everything **Restart** Bind with `$ systemctl restart named`
+
+Now we check forward lookup zone file for any syntax error with: `named-checkzone forward.sdi04a.mi.hdm-stuttgart forward.sdi04a.mi.hdm-stuttgart.com`
+
+The result should look like
+
+```
+zone forward.exampledomain/IN: loaded serial 2
+OK
+```
+
+Now we check reverse lookup zone file for any syntax error with: `named-checkzone reverse.sdi04a.mi.hdm-stuttgart reverse.sdi04a.mi.hdm-stuttgart.com`
+
+The result should look like:
+
+```
+zone reverse.exampledomain/IN: loaded serial 1
+OK
+```
+
+## Testing BIND DNS server functuality (aka "does it work?")
+
+The BIND server is now fully configured and installed. We use the dig tool to test:
+
+`$ dig ns1.sdi4.mi.hdm-stuttgart.de`
+
+You should see the following output:
+
+```
+; <<>> DiG 9.16.37-Debian <<>> ns1.sdi4.mi.hdm-stuttgart.de
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 26502
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: 0d79abfe7a5dbe0e01000000643d542464f42d119ffe9a06 (good)
+;; QUESTION SECTION:
+;ns1.sdi4.mi.hdm-stuttgart.de.	IN	A
+
+;; ANSWER SECTION:
+ns1.sdi4.mi.hdm-stuttgart.de. 604800 IN	A	141.62.75.104
+
+;; Query time: 0 msec
+;; SERVER: ::1#53(::1)
+;; WHEN: Mon Apr 17 16:13:56 CEST 2023
+;; MSG SIZE  rcvd: 101
+```
+
+Now, run this dig command: `$ dig -x 141.62.75.104` to perform the reverse lookup query. The output should look like this:
+
+```
+; <<>> DiG 9.16.37-Debian <<>> -x 141.62.75.104
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 43388
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: 6993afbdb01fd06101000000643d555005cc24b385b64798 (good)
+;; QUESTION SECTION:
+;104.75.62.141.in-addr.arpa.	IN	PTR
+
+;; AUTHORITY SECTION:
+75.62.141.in-addr.arpa.	604800	IN	SOA	ns1.sdi4.mi.hdm-stuttgart.de. root.ns1.sdi4.mi.hdm-stuttgart.de. 1 604800 86400 2419200 604800
+
+;; Query time: 0 msec
+;; SERVER: ::1#53(::1)
+;; WHEN: Mon Apr 17 16:18:56 CEST 2023
+;; MSG SIZE  rcvd: 152
 ```
