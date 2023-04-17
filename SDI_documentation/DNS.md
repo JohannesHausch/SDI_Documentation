@@ -305,3 +305,27 @@ mx1.hdm-stuttgart.de.	3600	IN	A	141.62.1.22
 ;; WHEN: Mon Apr 17 16:38:25 CEST 2023
 ;; MSG SIZE  rcvd: 93
 ```
+
+## Define publicly DNS records
+
+At first we need to create an environment variable called HMAC, where we save our HMAC-key.
+
+We do this by first executing this command:
+`$ HMAC=hmac-sha256:mykey.g4:MY_SECRET_PASSWORD`
+
+Then we can use our HMAC variable to update the DNS record dynamically using the following commands:
+
+```
+$ nsupdate -y $HMAC
+> server nssdi.mi.hdm-stuttgart.de
+> update add sdi1.g4.sdi.mi.hdm-stuttgart.de 86400 A 141.62.75.104
+> send
+> update add sdi2.g4.sdi.mi.hdm-stuttgart.de 86400 A 141.62.75.118
+> send
+> quit
+```
+
+To check the entry enter the following command:
+`$ /etc/bind/Zones# dig +noall +answer @nssdi.mi.hdm-stuttgart.de sdi2.g4.sdi.mi.hdm-stuttgart.de`
+The output should look like this:
+`sdi2.g4.sdi.mi.hdm-stuttgart.de. 86400 IN A    141.62.75.118`
