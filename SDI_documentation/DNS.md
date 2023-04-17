@@ -7,7 +7,7 @@ In order to set up an [Authoritative DNS](https://support.cpanel.net/hc/en-us/ar
 
 Output should look like this:
 
-```sh
+```
 root@sdi04a:~# aptitude install bind9
 Die folgenden NEUEN Pakete werden zusätzlich installiert:
   bind9 bind9-utils{a} dns-root-data{a} python3-ply{a}
@@ -56,7 +56,7 @@ One of the first things you should do is to edit the file /etc/bind/named.conf.o
 
 Here is an example on how to edit the file:
 
-```sh
+```
 forwarders {
         1.1.1.1; // Cloudflare
         8.8.8.8; // Google
@@ -85,7 +85,7 @@ zone "75.62.141.in-addr.arpa"{
 
 Now you need to create the zone files. We do this by copying the templates:
 
-```sh
+```
 $ cp /etc/bind/db.127 /etc/bind/Zones/reverse.mi.hdm-stuttgart.de
 $ cp /etc/bind/db.local /etc/bind/Zones/forward.mi.hdm-stuttgart.de
 ```
@@ -94,7 +94,7 @@ $ cp /etc/bind/db.local /etc/bind/Zones/forward.mi.hdm-stuttgart.de
 
 The unedited template file for forward-zone looks like this:
 
-```sh
+```
 $TTL    604800
 @       IN      SOA     localhost. root.localhost. (
                               2         ; Serial
@@ -194,7 +194,7 @@ ns1     IN      A       141.62.75.104
 
 Last but not least we need to edit the resolve.conf. It looks like this after editing:
 
-```sh
+```
 # --- BEGIN PVE ---
 search sdi4.mi.hdm-stuttgart.de
 ns1 141.62.75.104
