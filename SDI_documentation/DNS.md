@@ -274,3 +274,34 @@ Now, run this dig command: `$ dig -x 141.62.75.104` to perform the reverse looku
 ;; WHEN: Mon Apr 17 16:18:56 CEST 2023
 ;; MSG SIZE  rcvd: 152
 ```
+
+## Mail exchange record
+
+The configuration of a mail record is very similar to the configuration of the the name. All you need to do is to add this line to the forward zone file: `@ IN MX 10 mx1.hdm-stuttgart.de`
+
+To test if everything works fine run this command: `$ dig @141.62.75.104 mx1.hdm-stuttgart.de`
+
+The output should look like this:
+
+```
+; <<>> DiG 9.16.37-Debian <<>> @141.62.75.104 mx1.hdm-stuttgart.de
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 5776
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: e1e6457b959cf6bd01000000643d59e1b8fa18809fa4dd05 (good)
+;; QUESTION SECTION:
+;mx1.hdm-stuttgart.de.		IN	A
+
+;; ANSWER SECTION:
+mx1.hdm-stuttgart.de.	3600	IN	A	141.62.1.22
+
+;; Query time: 31 msec
+;; SERVER: 141.62.75.104#53(141.62.75.104)
+;; WHEN: Mon Apr 17 16:38:25 CEST 2023
+;; MSG SIZE  rcvd: 93
+```
