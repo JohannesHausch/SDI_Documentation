@@ -94,7 +94,47 @@ Move to the `/var/www/html/` directory and create a new file using touch. Name i
 ## Install the Apache documentation 
 Install the package apache2-doc with:
 
-`sudo apt install apache2-doc`
+`apt install apache2-doc`
 
 Now Acces the Apache document with /manual
 
+## Show documentation on the webserver
+
+Upload your current HTML documentation to the `/var/www` directory. To make sure that the web server can access the site, you will need to set the appropriate permissions. In our case, it's the `sdidoc` directory:
+```
+chown -R www-data:www-data /var/www/sdidoc
+chmod -R 755 /var/www/sdidoc
+```
+
+Now edit the conf in `/etc/apache2/apache2.conf` and add the path to your HTML documentation:
+
+```
+Alias /g4-doc /var/www/sdidoc/_build/html
+
+<Directory "/var/www/sdidoc/_build/html">
+  Options Indexes FollowSymlinks
+  AllowOverride None
+  Require all granted
+  AddDefaultCharset off
+</Directory>
+```
+After Restarting Apache we can now open our Webiste and add /doc-conf to see our Documentatio
+
+## Virtual host
+
+To set up a virtual host for your website, you need to create a configuration file like `g4-doc.conf` in the `/etc/apache2/sites-available/` directory. You can then configure the virtual host in the created file.
+
+```
+<VirtualHost *:80>
+  DocumentRoot /var/www/sdidoc/_build/html
+  ServerName mi.hdm-stuttgart.de
+  ServerAlias doc4.g4.sdi.mi.hdm-stuttgart.de
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost> 
+```
+
+Use the command `a2ensite` and enter the name of the config file.
+
+After restarting apache, you can now open your documentation under:
+http://doc4.g4.sdi.mi.hdm-stuttgart.de/intro.html
