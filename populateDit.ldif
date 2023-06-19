@@ -1,0 +1,31 @@
+dn: ou=software,ou=departments,dc=betrayer,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: software
+
+dn: ou=financial,ou=departments,dc=betrayer,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: financial
+
+dn: ou=devel,ou=software,ou=departments,dc=betrayer,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: devel
+
+dn: ou=testing,ou=software,ou=departments,dc=betrayer,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: testing
+
+dn: uid=bean,ou=devel,ou=software,ou=departments,dc=betrayer,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Jim Bean
+sn: Bean
+givenName: Jim
+mail: bean@betrayer.com
+uid: bean
+userPassword:: e3NtZDV9YVhKL2JlVkF2TDRENk9pMFRLcDhjM3ovYTZQZzBXeHA=
