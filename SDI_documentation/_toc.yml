@@ -7,4 +7,3 @@ chapters:
 - file: DNS
 - file: LDAP
 - file: Apache
-- file: SSL
