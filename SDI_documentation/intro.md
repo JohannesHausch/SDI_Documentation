@@ -1,8 +1,8 @@
-# Software defined infrastructure Dokumentation
+# Software defined infrastructure documentation
 
-Dies ist ein kleines Dokumentationsbuch für unsere Vorlesung SoftwareDefinedIfrastructure.
+This is a small documentation book for our lecture SoftwareDefinedIfrastructure.
 
-Es zeigt unsere Herangehensweise an alle Hauptthemen der Vorlesung.
+It shows our approach to the topics of the lecture.
 
 ```{tableofcontents}
 ```
