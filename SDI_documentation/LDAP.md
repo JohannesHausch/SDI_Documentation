@@ -363,7 +363,7 @@ userPassword:: e3NtZDV9YVhKL2JlVkF2TDRENk9pMFRLcDhjM3ovYTZQZzBXeHA=
 
 1. You have already added a userPassword in the previous step. If you did not use the provided ldif file to add the userPassword, you must add the userPassword manually.
 
-2. Add the new attribute by clicking the new attribute button in the upper right corner:3.
+2. Add the new attribute by clicking the new attribute button in the upper right corner:
 
 ```{image} ./images/add_image_01.png
 :alt: attribute button location
@@ -402,3 +402,123 @@ userPassword:: e3NtZDV9YVhKL2JlVkF2TDRENk9pMFRLcDhjM3ovYTZQZzBXeHA=
 :width: 100%
 :align: center
 ```
+
+
+## Extending an existing entry
+
+To extend an existing object, we need to add an object to one of the object classes. To do this, right click on the objectClass and select 'New Value', select the posixAccount and press 'Add'.
+
+```{image} ./images/posix_account.png
+:alt: object editor 
+:height: 500px
+:align: center
+```
+After clicking Next, enter a value for gidNumber, homeDirectory and uidNumber. Finish the configuration by clicking Finish.
+
+Now it should look like this:
+
+```{image} ./images/posix_account_2.png
+:alt: object editor 
+:height: 500px
+:align: center
+```
+
+## Filter based search
+We can search the LDAP using filters by clicking on "Search" and then on "New Search". Here are some examples:
+
+### All users with a uid attribute value starting with the letter “b”.
+The Filter for this is: 
+```
+(&
+    (uid=b*)
+    (objectClass=inetOrgPerson)
+)
+```
+
+```{image} ./images/filter_01.png
+:alt: Search editor
+:height: 500px
+:align: center
+```
+
+### All entries either with either a defined uid attribute or a ou attribute starting with letter “d”.
+The Filter for this is: 
+
+```
+(|
+    (uid=*)
+    (ou=d*)
+)
+```
+
+```{image} ./images/filter_02.png
+:alt: Search editor
+:height: 500px
+:align: center
+```
+
+### All users entries within the whole DIT having a gidNumber value of 100.
+The Filter for this is:
+``` 
+(&
+    (gidNumber=100)
+    (objectClass=inetOrgPerson)
+)
+```
+
+```{image} ./images/filter_03.png
+:alt: Search editor
+:height: 500px
+:align: center
+```
+
+### All user entries belonging to the billing department having a uid value greater than 1023.
+The Filter for this is: 
+```
+(&
+    (uidNumber>=1023)
+    (objectClass=inetOrgPerson)
+)
+```
+```{image} ./images/filter_04.png
+:alt: Search editor
+:height: 500px
+:align: center
+```
+
+### All user entries within the whole DIT having a commonName containing the substring “ei”.
+The Filter for this is: 
+```
+(&
+    (objectClass=inetOrgPerson)
+    (cn=*El*)
+)
+```
+```{image} ./images/filter_05.png
+:alt: Search editor
+:height: 500px
+:align: center
+```
+
+### All user entries within the whole DIT belonging to gidNumber == 100 or having a uid value starting with letter “t”.
+The Filter for this is: 
+``` 
+(&
+    (objectClass=inetOrgPerson)
+    (gidNumber=100)
+    (uid=t*)
+)
+```
+```{image} ./images/filter_06.png
+:alt: Search editor
+:height: 500px
+:align: center
+```
+
+
+## Accessing LDAP data by a mail client
+
+To use LDAP data with a mail client, it is necessary to add a new address book. It's configuration is shown in the image below:
+
+
+
