@@ -520,5 +520,16 @@ The Filter for this is:
 
 To use LDAP data with a mail client, it is necessary to add a new address book. It's configuration is shown in the image below:
 
+```{image} ./images/mail_ldap.png
+:alt: mail client ldap setup
+:height: 500px
+:align: center
+```
 
+After configuring the address book, addresses are only available when searching. As shown in the image below, we can now find the characters we created when populating our tree.
 
+```{image} ./images/ldap_jim.png
+:alt: address book
+:height: 500px
+:align: center
+```
