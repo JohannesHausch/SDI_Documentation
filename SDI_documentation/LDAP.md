@@ -977,3 +977,50 @@ rainer@sdi04b.mi.hdm-stuttgart.de's password: YOUR_PASSWORD
 drwxr-xr-x  2 rainer   1002  5 25. Jul 14:15 rainer
 ```
 
+## Backup and recovery / restore
+
+To make a backup and save it on another VM, you need to make a backup of your ldap database in the first vm and paste it into the ldap in the second VM.
+If your second VM does not have an LDAP server, create one.
+
+
+```
+# slapcat -b cn=config -l ldap-config.ldif 
+# slapcat -l ldap-data.ldif
+```
+
+
+
+```
+# systemctl stop slapd
+# slapadd -b cn=config -l ~/ldap_config/ldap-config.ldif -F /etc/ldap/slapd.d/
+slapadd: could not add entry dn="cn=config" (line=1): 
+_                       1.05% eta   none elapsed            none spd   1.8 M/s 
+Closing DB...
+# slapadd -n 1 -l ~/ldap_config/ldap-data.ldif -F /etc/ldap/slapd.d/
+64bfc7df mdb_id2entry_put: mdb_put failed: MDB_KEYEXIST: Key/data pair already exists(-30799) "dc=betrayer,dc=com"
+64bfc7df => mdb_tool_entry_put: id2entry_add failed: err=-30799
+64bfc7df => mdb_tool_entry_put: txn_aborted! MDB_KEYEXIST: Key/data pair already exists (-30799)
+slapadd: could not add entry dn="dc=betrayer,dc=com" (line=1): txn_aborted! MDB_KEYEXIST: Key/data pair already exists (-30799)
+_##                    10.57% eta   none elapsed            none spd 866.3 k/s 
+Closing DB...
+root@sdi04b:~/ldap_config# 
+```
+The content of the ldap-data-b.ldif file is displayed below with the command output, which contains the LDIF entry for an organization in the LDAP directory with the following attributes:
+```
+# slapcat -l ~/ldap_config/ldap-data-b.ldif
+# cat ~/ldap_config/ldap-data-b.ldif 
+dn: dc=betrayer,dc=com
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: seeligen
+dc: betrayer
+structuralObjectClass: organization
+entryUUID: f8d02634-bf34-103d-9d19-675229d102db
+creatorsName: cn=admin,dc=betrayer,dc=com
+createTimestamp: 20230725124608Z
+entryCSN: 20230725124608.794420Z#000000#000#000000
+modifiersName: cn=admin,dc=betrayer,dc=com
+modifyTimestamp: 20230725124608Z
+
+```
