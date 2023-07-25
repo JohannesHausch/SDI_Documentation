@@ -969,7 +969,7 @@ Jul 25 14:22:15 sdi04b systemd[1]: Stopped Name Service Cache Daemon.
 
 9: To test the login use this command:
 ```
-ssh rainer@ssh rainer@sdi04b.mi.hdm-stuttgart.de 
+ssh rainer@sdi04b.mi.hdm-stuttgart.de 
 rainer@sdi04b.mi.hdm-stuttgart.de's password: YOUR_PASSWORD
 ```
 10. You can test if the user has the home directory by using this command: `ls -la`.
