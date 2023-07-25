@@ -982,45 +982,158 @@ drwxr-xr-x  2 rainer   1002  5 25. Jul 14:15 rainer
 To make a backup and save it on another VM, you need to make a backup of your ldap database in the first vm and paste it into the ldap in the second VM.
 If your second VM does not have an LDAP server, create one.
 
-
+1. You can create a backup of the original ldap like this:
 ```
 # slapcat -b cn=config -l ldap-config.ldif 
 # slapcat -l ldap-data.ldif
 ```
 
+2. To copy the backup to the other vm, you can use ssh to transmit it. Generate a public ssh key in the first vm, copy it and paste it into the "authorized_keys"-file of the second vm.
 
-
+3. Establish an connection via "scp" and transmit the "config" and "data" file of the ldap backup. These are the commands to do it:
 ```
-# systemctl stop slapd
+# scp /root/ldap_config/ldap-config.ldif root@sdi04b.mi.hdm-stuttgart.de:/root/ldap_config/ldap-config.ldif
+ldap-config.ldif                                                      100%   38KB  34.5MB/s   00:00    
+```
+```
+# scp /root/ldap_config/ldap-data.ldif  root@sdi04b.mi.hdm-stuttgart.de:/root/ldap_config/ldap-data.ldif
+ldap-data.ldif                                                        100% 3793     6.1MB/s   00:00 
+```
+4. Login into your other vm and install the backups by calling these commands:
+```
 # slapadd -b cn=config -l ~/ldap_config/ldap-config.ldif -F /etc/ldap/slapd.d/
-slapadd: could not add entry dn="cn=config" (line=1): 
-_                       1.05% eta   none elapsed            none spd   1.8 M/s 
+_#################### 100.00% eta   none elapsed            none fast!         
 Closing DB...
 # slapadd -n 1 -l ~/ldap_config/ldap-data.ldif -F /etc/ldap/slapd.d/
-64bfc7df mdb_id2entry_put: mdb_put failed: MDB_KEYEXIST: Key/data pair already exists(-30799) "dc=betrayer,dc=com"
-64bfc7df => mdb_tool_entry_put: id2entry_add failed: err=-30799
-64bfc7df => mdb_tool_entry_put: txn_aborted! MDB_KEYEXIST: Key/data pair already exists (-30799)
-slapadd: could not add entry dn="dc=betrayer,dc=com" (line=1): txn_aborted! MDB_KEYEXIST: Key/data pair already exists (-30799)
-_##                    10.57% eta   none elapsed            none spd 866.3 k/s 
+_#################### 100.00% eta   none elapsed            none fast!         
 Closing DB...
-root@sdi04b:~/ldap_config# 
 ```
-The content of the ldap-data-b.ldif file is displayed below with the command output, which contains the LDIF entry for an organization in the LDAP directory with the following attributes:
+
+5. Next, we use the "slapcat" command to extract data from the LDAP directory and store it in a file called "ldap-data-b.ldif" within the "~/ldap_config" directory. This process effectively transfers the data from the LDAP directory to the specified LDIF file.
+
 ```
-# slapcat -l ~/ldap_config/ldap-data-b.ldif
-# cat ~/ldap_config/ldap-data-b.ldif 
+# slapcat -l ldap-data-b.ldif
+```
+6. To verify the successful transfer of data, we can then examine the contents of the newly created LDIF file and verify that it is the same as the backup LDIF.
+```
+# cat ldap-data-b.ldif 
 dn: dc=betrayer,dc=com
 objectClass: top
 objectClass: dcObject
 objectClass: organization
-o: seeligen
+o: gruppe_04
 dc: betrayer
 structuralObjectClass: organization
-entryUUID: f8d02634-bf34-103d-9d19-675229d102db
+entryUUID: f0877648-8772-103d-9927-f5e99155b8e2
 creatorsName: cn=admin,dc=betrayer,dc=com
-createTimestamp: 20230725124608Z
-entryCSN: 20230725124608.794420Z#000000#000#000000
+createTimestamp: 20230515134838Z
+entryCSN: 20230515134838.577967Z#000000#000#000000
 modifiersName: cn=admin,dc=betrayer,dc=com
-modifyTimestamp: 20230725124608Z
+modifyTimestamp: 20230515134838Z
 
+dn: ou=departments,dc=betrayer,dc=com
+ou: departments
+objectClass: organizationalUnit
+objectClass: top
+structuralObjectClass: organizationalUnit
+entryUUID: 03925dae-877b-103d-80ae-693c87ddfaaf
+creatorsName: cn=admin,dc=betrayer,dc=com
+createTimestamp: 20230515144626Z
+entryCSN: 20230515144626.500097Z#000000#000#000000
+modifiersName: cn=admin,dc=betrayer,dc=com
+modifyTimestamp: 20230515144626Z
+
+dn: ou=software,ou=departments,dc=betrayer,dc=com
+ou: software
+objectClass: top
+objectClass: organizationalUnit
+structuralObjectClass: organizationalUnit
+entryUUID: f051f770-8cf4-103d-80af-693c87ddfaaf
+creatorsName: cn=admin,dc=betrayer,dc=com
+createTimestamp: 20230522140148Z
+entryCSN: 20230522140148.616237Z#000000#000#000000
+modifiersName: cn=admin,dc=betrayer,dc=com
+modifyTimestamp: 20230522140148Z
+
+dn: ou=financial,ou=departments,dc=betrayer,dc=com
+ou: financial
+objectClass: top
+objectClass: organizationalUnit
+structuralObjectClass: organizationalUnit
+entryUUID: f054725c-8cf4-103d-80b0-693c87ddfaaf
+creatorsName: cn=admin,dc=betrayer,dc=com
+createTimestamp: 20230522140148Z
+entryCSN: 20230522140148.632495Z#000000#000#000000
+modifiersName: cn=admin,dc=betrayer,dc=com
+modifyTimestamp: 20230522140148Z
+
+dn: ou=devel,ou=software,ou=departments,dc=betrayer,dc=com
+ou: devel
+objectClass: top
+objectClass: organizationalUnit
+structuralObjectClass: organizationalUnit
+entryUUID: f056011c-8cf4-103d-80b1-693c87ddfaaf
+creatorsName: cn=admin,dc=betrayer,dc=com
+createTimestamp: 20230522140148Z
+entryCSN: 20230522140148.642704Z#000000#000#000000
+modifiersName: cn=admin,dc=betrayer,dc=com
+modifyTimestamp: 20230522140148Z
+
+dn: ou=testing,ou=software,ou=departments,dc=betrayer,dc=com
+ou: testing
+objectClass: top
+objectClass: organizationalUnit
+structuralObjectClass: organizationalUnit
+entryUUID: f0577ccc-8cf4-103d-80b2-693c87ddfaaf
+creatorsName: cn=admin,dc=betrayer,dc=com
+createTimestamp: 20230522140148Z
+entryCSN: 20230522140148.652424Z#000000#000#000000
+modifiersName: cn=admin,dc=betrayer,dc=com
+modifyTimestamp: 20230522140148Z
+
+dn: uid=bean,ou=devel,ou=software,ou=departments,dc=betrayer,dc=com
+uid: bean
+mail: bean@betrayer.com
+givenName: Jim
+cn: Jim Bean
+sn: Bean
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: posixAccount
+structuralObjectClass: inetOrgPerson
+entryUUID: f059010a-8cf4-103d-80b3-693c87ddfaaf
+creatorsName: cn=admin,dc=betrayer,dc=com
+createTimestamp: 20230522140148Z
+homeDirectory: /home/jim
+gidNumber: 1
+userPassword:: e1NTSEF9enlPV20zTCt1cmZKa2pBNlArTjM2WVlTMVdhZG5OZzc3Q2ExcVE9P
+ Q==
+uidNumber: 1001
+entryCSN: 20230725120124.645863Z#000000#000#000000
+modifiersName: cn=admin,dc=betrayer,dc=com
+modifyTimestamp: 20230725120124Z
+
+dn: cn=Rainer Zufall,ou=devel,ou=software,ou=departments,dc=betrayer,dc=com
+uid: rainer
+uidNumber: 1002
+homeDirectory: /home/rainer
+gidNumber: 1002
+sn: Rainer
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+objectClass: posixAccount
+structuralObjectClass: inetOrgPerson
+entryUUID: 5bf37568-bf30-103d-9479-47ebfcdeb317
+creatorsName: cn=admin,dc=betrayer,dc=com
+createTimestamp: 20230725121307Z
+cn: Rainer Zufall
+userPassword:: e1NTSEF9Zm9BL1phZUhCUy9haDBibGdjcDZCNUlta0dLOE9Ecy9KcmpuMGc9P
+ Q==
+entryCSN: 20230725121504.037127Z#000000#000#000000
+modifiersName: cn=admin,dc=betrayer,dc=com
+modifyTimestamp: 20230725121504Z
 ```
