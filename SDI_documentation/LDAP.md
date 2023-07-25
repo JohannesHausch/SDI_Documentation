@@ -538,7 +538,7 @@ After configuring the address book, addresses are only available when searching.
 
 1. Create the file add_olcRootPW.ldif  with `touch add_olcRootPW.ldif`.
 
-2. Edit the 'add_oldRootPW.ldif' file by incorporating a securely hashed password, ensuring its format aligns with the provided sample.
+2. Edit the add_oldRootPW.ldif file by incorporating a securely hashed password, ensuring its format aligns with the provided sample.
 ```
 # cat add_olcRootPW.ldif 
 dn: olcDatabase={0}config,cn=config
@@ -553,7 +553,9 @@ modifying entry "olcDatabase={0}config,cn=config"
 ```
 
 4. You can now get the ldap configuration with this command: 
-```root@sdi04a:~/ldap_config# ldapsearch -Y EXTERNAL -H ldapi:/// -b cn=config```
+```
+root@sdi04a:~/ldap_config# ldapsearch -Y EXTERNAL -H ldapi:/// -b cn=config
+```
 ```
 root@sdi04a:~/ldap_config# ldapsearch -Y EXTERNAL -H ldapi:/// -b cn=config
 SASL/EXTERNAL authentication started
@@ -639,21 +641,22 @@ result: 0 Success
 
 ### Connecting the LDAP
 
-1. Create a new connection 
+1. Create a new connection .
 ```{image} ./images/config_01.png
 :alt: Ldap configuration
 :height: 500px
 :align: center
 ```
 
-2. Create new Bind user
+2. Authentify with the config account.
+
 ```{image} ./images/config_02.png
 :alt: Ldap configuration
 :height: 500px
 :align: center
 ```
 
-3. Set the Base DN to cn=config
+3. Set the Base DN to `cn=config`.
 
 
 ```{image} ./images/config_03.png
@@ -662,7 +665,7 @@ result: 0 Success
 :align: center
 ```
 
-4. After connecting you can change the `olcLogLevel`. You can get the most information by using a olcLogLevel of -1.
+4. After connecting you can change the `olcLogLevel`. You can get the most information by using a `olcLogLevel` of -1.
 ```{image} ./images/config_04.png
 :alt: Change loging level
 :width: 100%
@@ -698,3 +701,279 @@ Jul 25 11:53:58 sdi04a systemd[1]: Started OpenBSD Secure Shell server per-conne
 Jul 25 11:53:59 sdi04a systemd[1]: Started Session 914967 of user root.
 (END)
 ```
+
+
+
+## LDAP based user login
+
+1. Create a backup of our working PAM configuration using this commands:
+```
+cd /etc
+tar zcf /root/pam.tgz pam.conf pam.d
+```
+
+Use `tar ztf /root/pam.tgz ` to see if it worked it should look like this:
+
+```
+# tar ztf /root/pam.tgz 
+pam.conf
+pam.d/
+pam.d/sudo
+pam.d/chsh
+pam.d/runuser
+pam.d/chfn
+pam.d/common-auth
+pam.d/other
+pam.d/su
+pam.d/su-l
+pam.d/common-session-noninteractive
+pam.d/passwd
+pam.d/newusers
+pam.d/cron
+pam.d/common-password
+pam.d/common-session
+pam.d/common-account
+pam.d/login
+pam.d/sshd
+pam.d/chpasswd
+pam.d/runuser-l
+```
+
+2. Install libpam-ldapd with `apt install libpam-ldapd`.
+
+3. Enter your LDAP URI.
+
+```
+
+ ┌──────────────────────────────────────┤ Konfiguriere nslcd ├───────────────────────────────────────┐
+ │ Bitte geben Sie den Uniform Resource Identifier des benutzten LDAP-Servers ein. Das Format ist    │ 
+ │ »ldap://<Rechnername oder IP-Adresse>:<Port>/«. Alternativ kann auch »ldaps://« oder »ldapi://«   │ 
+ │ benutzt werden. Der Port muss nicht angegeben werden.                                             │ 
+ │                                                                                                   │ 
+ │ Wenn Sie »ldap« oder »ldaps« verwenden, sollten Sie eine IP-Adresse eingeben, um Ausfälle zu      │ 
+ │ verhindern, falls die Namensauflösung einmal nicht verfügbar ist.                                 │ 
+ │                                                                                                   │ 
+ │ Mehrere URIs können, durch Leerzeichen getrennt, angegeben werden.                                │ 
+ │                                                                                                   │ 
+ │ URI des LDAP-Servers:                                                                             │ 
+ │                                                                                                   │ 
+ │ ldap://sdi04a.mi.hdm-stuttgart.de________________________________________________________________ │ 
+ │                                                                                                   │ 
+ │                            <Ok>                                <Abbrechen>                        │ 
+ │                                                                                                   │ 
+ └───────────────────────────────────────────────────────────────────────────────────────────────────┘ 
+                                                                                                       
+```
+
+4. Enter your LDAP searchbase.
+```
+
+ ┌──────────────────────────────────────┤ Konfiguriere nslcd ├───────────────────────────────────────┐
+ │ Bitte geben Sie den DN (distinguished name) der LDAP-Suchbasis ein. Oft werden Teile des          │ 
+ │ Domänennamens für diesen Zweck benutzt. Beispielsweise würde bei der Domäne »example.net« der DN  │ 
+ │ »dc=example,dc=net« als Suchbasis verwendet werden.                                               │ 
+ │                                                                                                   │ 
+ │ Suchbasis des LDAP-Servers:                                                                       │ 
+ │                                                                                                   │ 
+ │ dc=betrayer, dc=com______________________________________________________________________________ │ 
+ │                                                                                                   │ 
+ │                            <Ok>                                <Abbrechen>                        │ 
+ │                                                                                                   │ 
+ └───────────────────────────────────────────────────────────────────────────────────────────────────┘ 
+                                                                                                       
+```
+4. Normally a window would open now to configure the package, but we made a mistake by hitting enter and thus closed the configuration wizard, so to configure the last step we had to do it manually by opening nsswitch.conf and editing it accordingly:
+
+```
+# /etc/nsswitch.conf
+#
+# Example configuration of GNU Name Service Switch functionality.
+# If you have the `glibc-doc-reference' and `info' packages installed, try:
+# `info libc "Name Service Switch"' for information about this file.
+
+passwd:         files ldap   
+group:          files ldap   
+shadow:         files ldap
+gshadow:        files
+
+hosts:          files dns
+networks:       files
+
+protocols:      db files
+services:       db files
+ethers:         db files
+rpc:            db files
+
+netgroup:       nis
+```
+5. Afterwards, reboot with `systemctl restart nslcd` to make sure the new config is used, and test it with a test user's id. Make sure your test user's id is above 1000, otherwise you will not be able to use it to log in to the vm:
+
+```
+# id rainer
+uid=1002(rainer) gid=1002 Gruppen=1002
+```
+
+6. `PasswordAuthentication` should be set to `yes` in `/etc/ssh/sshd_config`:
+
+```
+# cat /etc/ssh/sshd_config
+
+#	$OpenBSD: sshd_config,v 1.103 2018/04/09 20:41:22 tj Exp $
+
+# This is the sshd server system-wide configuration file.  See
+# sshd_config(5) for more information.
+
+# This sshd was compiled with PATH=/usr/bin:/bin:/usr/sbin:/sbin
+
+# The strategy used for options in the default sshd_config shipped with
+# OpenSSH is to specify options with their default value where
+# possible, but leave them commented.  Uncommented options override the
+# default value.
+
+Include /etc/ssh/sshd_config.d/*.conf
+
+#Port 22
+#AddressFamily any
+#ListenAddress 0.0.0.0
+#ListenAddress ::
+
+#HostKey /etc/ssh/ssh_host_rsa_key
+#HostKey /etc/ssh/ssh_host_ecdsa_key
+#HostKey /etc/ssh/ssh_host_ed25519_key
+
+# Ciphers and keying
+#RekeyLimit default none
+
+# Logging
+#SyslogFacility AUTH
+#LogLevel INFO
+
+# Authentication:
+
+#LoginGraceTime 2m
+#PermitRootLogin prohibit-password
+#StrictModes yes
+#MaxAuthTries 6
+#MaxSessions 10
+
+#PubkeyAuthentication yes
+
+# Expect .ssh/authorized_keys2 to be disregarded by default in future.
+#AuthorizedKeysFile	.ssh/authorized_keys .ssh/authorized_keys2
+
+#AuthorizedPrincipalsFile none
+
+#AuthorizedKeysCommand none
+#AuthorizedKeysCommandUser nobody
+
+# For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
+#HostbasedAuthentication no
+# Change to yes if you don't trust ~/.ssh/known_hosts for
+# HostbasedAuthentication
+#IgnoreUserKnownHosts no
+# Don't read the user's ~/.rhosts and ~/.shosts files
+#IgnoreRhosts yes
+
+# To disable tunneled clear text passwords, change to no here!
+PasswordAuthentication yes
+#PermitEmptyPasswords no
+
+# Change to yes to enable challenge-response passwords (beware issues with
+# some PAM modules and threads)
+ChallengeResponseAuthentication no
+
+# Kerberos options
+#KerberosAuthentication no
+#KerberosOrLocalPasswd yes
+#KerberosTicketCleanup yes
+#KerberosGetAFSToken no
+
+# GSSAPI options
+#GSSAPIAuthentication no
+#GSSAPICleanupCredentials yes
+#GSSAPIStrictAcceptorCheck yes
+#GSSAPIKeyExchange no
+
+# Set this to 'yes' to enable PAM authentication, account processing,
+# and session processing. If this is enabled, PAM authentication will
+# be allowed through the ChallengeResponseAuthentication and
+# PasswordAuthentication.  Depending on your PAM configuration,
+# PAM authentication via ChallengeResponseAuthentication may bypass
+# the setting of "PermitRootLogin without-password".
+# If you just want the PAM account and session checks to run without
+# PAM authentication, then enable this but set PasswordAuthentication
+# and ChallengeResponseAuthentication to 'no'.
+UsePAM yes
+
+#AllowAgentForwarding yes
+#AllowTcpForwarding yes
+#GatewayPorts no
+X11Forwarding yes
+#X11DisplayOffset 10
+#X11UseLocalhost yes
+#PermitTTY yes
+PrintMotd no
+#PrintLastLog yes
+#TCPKeepAlive yes
+#PermitUserEnvironment no
+#Compression delayed
+#ClientAliveInterval 0
+#ClientAliveCountMax 3
+#UseDNS no
+#PidFile /var/run/sshd.pid
+#MaxStartups 10:30:100
+#PermitTunnel no
+#ChrootDirectory none
+#VersionAddendum none
+
+# no default banner path
+#Banner none
+
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_*
+
+# override default of no subsystems
+Subsystem	sftp	/usr/lib/openssh/sftp-server
+
+# Example of overriding settings on a per-user basis
+#Match User anoncvs
+#	X11Forwarding no
+#	AllowTcpForwarding no
+#	PermitTTY no
+#	ForceCommand cvs server
+```
+7. Make sure the results are not influenced by unwanted caching, by stoping the nscd service.
+```
+# systemctl stop nscd
+# systemctl status nscd
+● nscd.service - Name Service Cache Daemon
+     Loaded: loaded (/lib/systemd/system/nscd.service; enabled; vendor preset: enabled)
+     Active: inactive (dead) since Tue 2023-07-25 14:22:15 CEST; 6s ago
+    Process: 40931 ExecStart=/usr/sbin/nscd (code=exited, status=0/SUCCESS)
+    Process: 41017 ExecStop=/usr/sbin/nscd --shutdown (code=exited, status=0/SUCCESS)
+   Main PID: 40932 (code=exited, status=0/SUCCESS)
+        CPU: 24ms
+
+Jul 25 14:01:41 sdi04b nscd[40932]: 40932 überwache das Verzeichnis »/etc« (2)
+Jul 25 14:01:41 sdi04b nscd[40932]: 40932 Die inotify-basierte Überwachung für die Datei »/etc/netgroup>
+Jul 25 14:01:41 sdi04b nscd[40932]: 40932 »stat« für die Datei »/etc/netgroup« ist fehlgeschlagen; weit>
+Jul 25 14:01:41 sdi04b systemd[1]: Started Name Service Cache Daemon.
+Jul 25 14:02:00 sdi04b nscd[40932]: 40932 Prüfe auf überwachte Datei »/etc/netgroup«: Datei oder Verzei>
+Jul 25 14:05:59 sdi04b nscd[40932]: 40932 überwache Datei »/etc/resolv.conf« (5)
+Jul 25 14:05:59 sdi04b nscd[40932]: 40932 überwache das Verzeichnis »/etc« (2)
+Jul 25 14:22:15 sdi04b systemd[1]: Stopping Name Service Cache Daemon...
+Jul 25 14:22:15 sdi04b systemd[1]: nscd.service: Succeeded.
+Jul 25 14:22:15 sdi04b systemd[1]: Stopped Name Service Cache Daemon.
+```
+8. Now create a new home directory and change the access permissions. You can do this with this command:`mkhomedir_helper rainer`
+
+9: To test the login use this command:
+```
+ssh rainer@ssh rainer@sdi04b.mi.hdm-stuttgart.de 
+rainer@sdi04b.mi.hdm-stuttgart.de's password: YOUR_PASSWORD
+```
+10. You can test if the user has the home directory by using this command: `ls -la`.
+```
+drwxr-xr-x  2 rainer   1002  5 25. Jul 14:15 rainer
+```
+
