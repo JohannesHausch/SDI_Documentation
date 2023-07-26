@@ -80,7 +80,7 @@ EXIT;
 9. NextCloud Installation and server configuration.
 
 
-```{image} ./images/nextcloud_01
+```{image} ./images/nextcloud_01.png
 :alt: Search editor
 :width: 100%
 :align: center
@@ -89,7 +89,7 @@ EXIT;
 
 10. Now it should look like this
 
-```{image} ./images/nextcloud_02
+```{image} ./images/nextcloud_02.png
 :alt: Search editor
 :width: 100%
 :align: center
@@ -100,7 +100,7 @@ EXIT;
 
 1. Go to your APPs and activate LDAP user and group backend
 
-```{image} ./images/nextcloud_03
+```{image} ./images/nextcloud_03.png
 :alt: Search editor
 :width: 100%
 :align: center
@@ -108,13 +108,13 @@ EXIT;
 
 2. Go to Settings and LDAP there you can Integrate the LDAP to authenticate the Users we use `ldap1.hdm-stuttgart.de` for this
 
-```{image} ./images/nextcloud_04
+```{image} ./images/nextcloud_04.png
 :alt: Search editor
 :width: 100%
 :align: center
 ```
 
-```{image} ./images/nextcloud_05
+```{image} ./images/nextcloud_05.png
 :alt: Search editor
 :width: 100%
 :align: center
@@ -123,12 +123,12 @@ EXIT;
 3. Now we can Open NextCloud with our student ID and passwords
 
 
-```{image} ./images/nextcloud_06
+```{image} ./images/nextcloud_06.png
 :alt: Search editor
 :width: 100%
 :align: center
 ```
-```{image} ./images/nextcloud_07
+```{image} ./images/nextcloud_07.png
 :alt: Search editor
 :width: 100%
 :align: center
