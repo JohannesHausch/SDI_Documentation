@@ -1137,3 +1137,50 @@ entryCSN: 20230725121504.037127Z#000000#000#000000
 modifiersName: cn=admin,dc=betrayer,dc=com
 modifyTimestamp: 20230725121504Z
 ```
+
+## Accessing LDAP by a Java™ application.
+
+The following code example shows how to connect to the LDAP server:
+
+```
+import javax.naming.*;
+import javax.naming.directory.*;
+import java.util.Hashtable;
+
+public class Main {
+    public static void main(String[] args) {
+
+        String ldapUrl = "ldap://141.62.75.104:389"; // Adjust the URL and port as per your LDAP server configuration
+        String username = "cn=admin,dc=betrayer,dc=com"; // Replace with your admin user DN
+        String password = "qwertz"; // Replace with your admin user password
+        Hashtable<String, String> env = new Hashtable<>();
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.PROVIDER_URL, ldapUrl);
+        env.put(Context.SECURITY_AUTHENTICATION, "simple");
+        env.put(Context.SECURITY_PRINCIPAL, username);
+        env.put(Context.SECURITY_CREDENTIALS, password);
+
+
+        DirContext ctx = null;
+        try {
+            ctx = new InitialDirContext(env);
+            System.out.println("connected"); 
+            // Connection successful, you can proceed with LDAP operations here
+        } catch (NamingException e) {
+            // Handle connection errors
+            e.printStackTrace();
+        } finally {
+            System.out.println("connection Terminated");
+            // Close the context when done
+            if (ctx != null) {
+                try {
+                    ctx.close();
+                } catch (NamingException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+
+```
