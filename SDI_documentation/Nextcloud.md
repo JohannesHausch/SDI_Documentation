@@ -1,6 +1,6 @@
-## File cloud 
+# File cloud 
 
-### Set up a Nextcloud server
+## Set up a Nextcloud server
 
 1. First go to the Direktory where we want to install next cloud with `cd /var/www`.
 
@@ -95,7 +95,7 @@ EXIT;
 :align: center
 ```
 
-### Integrate LDAP authentication
+## Integrate LDAP authentication
 
 
 1. Go to your APPs and activate LDAP user and group backend.
