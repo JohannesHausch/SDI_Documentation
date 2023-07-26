@@ -499,10 +499,6 @@ Thanks for using MariaDB!
 
 3. The default Master password is "lam". Go to LAM Configuration to change the password.
 
-## Publishing the documentation
-
-We have already published the documantaion in a previous step.
-
 ## Publish your documentation
 
 Upload your current HTML documentation to the `/var/www` directory. To make sure that the web server can access the site, you will need to set the appropriate permissions. In our case, it's the `sdidoc` directory:
@@ -526,5 +522,3 @@ Alias /g4-doc /var/www/sdidoc/_build/html
 After Restarting Apache we can now open our Webiste and add /doc-conf to see our Documentation
 
 Our documentation is stored on Git, and our server clones it for easy access.
-
-
