@@ -340,3 +340,85 @@ Now test your configuration and reload apache.
 $ apache2ctl configtest
 $ service apache2 reload
 ```
+
+
+
+## LDAP authentication
+
+1. Create a new Test user "tuser" with a SMD5 Password
+
+```{image} ./images/tuser.png
+:alt: Apache Directory Studio User
+:width: 100%
+:align: center
+```
+
+2. Test LDAP bind access by user using Apache Directory Studio. 
+
+```{image} ./images/tuser_01.png
+:alt: Apache Directory Studio Bind connection
+:height: 500px
+:align: center
+```
+3. Edit the apache2-doc.conf, so the File looks like the following:
+
+```
+# cat apache2-doc.conf 
+Alias /manual /usr/share/doc/apache2-doc/manual/
+
+<Directory "/usr/share/doc/apache2-doc/manual/">
+    Options Indexes FollowSymlinks
+    AllowOverride None
+    Require all granted
+    AddDefaultCharset off
+</Directory>
+
+Alias /tuser /var/www/sdidoc/_build/html
+
+<Directory "/var/www/sdidoc/">
+    Options Indexes FollowSymlinks
+    AuthType Basic
+    AuthName "Apache LDAP authentication"
+    AuthBasicAuthoritative Off
+    AuthBasicProvider ldap
+    AuthLDAPURL "ldap://141.62.75.104/uid=tuser,ou=devel,ou=software,ou=departments,dc=betrayer,dc=com"
+    AuthLDAPBindDN "uid=tuser,ou=devel,ou=software,ou=departments,dc=betrayer,dc=com"
+    AuthLDAPBindPassword password
+    Require valid-user
+    AllowOverride None
+    AddDefaultCharset off
+</Directory>
+```
+
+
+
+4. Now activate the `authnz_ldap` module 
+
+```
+# a2enmod authnz_ldap
+Considering dependency ldap for authnz_ldap:
+Enabling module ldap.
+Enabling module authnz_ldap.
+To activate the new configuration, you need to run:
+systemctl restart apache2
+```
+and restart apache
+```
+# systemctl restart apache2
+```
+
+5. Now lets test if the Authentication works with : `https://doc4.g4.sdi.mi.hdm-stuttgart.de/tuser`.
+
+```{image} ./images/tuser_02.png
+:alt: Authentication
+:width: 100%
+:align: center
+```
+Now you can see the site behind the authentication:
+```{image} ./images/tuser_03.png
+:alt: Logged in
+:width: 100%
+:align: center
+```
+
+
