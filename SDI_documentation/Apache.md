@@ -98,28 +98,6 @@ Install the package apache2-doc with:
 
 Now Acces the Apache document with /manual
 
-## Show documentation on the webserver
-
-Upload your current HTML documentation to the `/var/www` directory. To make sure that the web server can access the site, you will need to set the appropriate permissions. In our case, it's the `sdidoc` directory:
-```
-chown -R www-data:www-data /var/www/sdidoc
-chmod -R 755 /var/www/sdidoc
-```
-
-Now edit the conf in `/etc/apache2/apache2.conf` and add the path to your HTML documentation:
-
-```
-Alias /g4-doc /var/www/sdidoc/_build/html
-
-<Directory "/var/www/sdidoc/_build/html">
-  Options Indexes FollowSymlinks
-  AllowOverride None
-  Require all granted
-  AddDefaultCharset off
-</Directory>
-```
-After Restarting Apache we can now open our Webiste and add /doc-conf to see our Documentatio
-
 ## Virtual host
 
 To set up a virtual host for your website, you need to create a configuration file like `g4-doc.conf` in the `/etc/apache2/sites-available/` directory. You can then configure the virtual host in the created file.
@@ -420,5 +398,133 @@ Now you can see the site behind the authentication:
 :width: 100%
 :align: center
 ```
+
+
+
+## MySQL database administration
+
+1. Install a MySQL database server instance with `aptitude install mariadb-server`
+
+2. Install MariaDB with  `mysql_secure_installation` and then it should look like this:
+
+```
+# mysql_secure_installation
+
+NOTE: RUNNING ALL PARTS OF THIS SCRIPT IS RECOMMENDED FOR ALL MariaDB
+      SERVERS IN PRODUCTION USE!  PLEASE READ EACH STEP CAREFULLY!
+
+In order to log into MariaDB to secure it, we'll need the current
+password for the root user. If you've just installed MariaDB, and
+haven't set the root password yet, you should just press enter here.
+
+Enter current password for root (enter for none): 
+OK, successfully used password, moving on...
+
+Setting the root password or using the unix_socket ensures that nobody
+can log into the MariaDB root user without the proper authorisation.
+
+You already have your root account protected, so you can safely answer 'n'.
+
+Switch to unix_socket authentication [Y/n] n
+ ... skipping.
+
+You already have your root account protected, so you can safely answer 'n'.
+
+Change the root password? [Y/n] n
+ ... skipping.
+
+By default, a MariaDB installation has an anonymous user, allowing anyone
+to log into MariaDB without having to have a user account created for
+them.  This is intended only for testing, and to make the installation
+go a bit smoother.  You should remove them before moving into a
+production environment.
+
+Remove anonymous users? [Y/n] Y
+ ... Success!
+
+Normally, root should only be allowed to connect from 'localhost'.  This
+ensures that someone cannot guess at the root password from the network.
+
+Disallow root login remotely? [Y/n] n
+ ... skipping.
+
+By default, MariaDB comes with a database named 'test' that anyone can
+access.  This is also intended only for testing, and should be removed
+before moving into a production environment.
+
+Remove test database and access to it? [Y/n] n
+ ... skipping.
+
+Reloading the privilege tables will ensure that all changes made so far
+will take effect immediately.
+
+Reload privilege tables now? [Y/n] Y
+ ... Success!
+
+Cleaning up...
+
+All done!  If you've completed all of the above steps, your MariaDB
+installation should now be secure.
+
+Thanks for using MariaDB!
+```
+
+3. Now Install phpmyadmin with `aptitude install phpmyadmin libapache2-mod-php` and check Apache2.
+
+4. Now we can access phpmyadmin with sdi1a.mi.hdm-stuttgart.de/phpmyadmin and log in with the password we set earlier.
+
+```{image} ./images/myAdmin_01.png
+:alt: Login phpmyadmin
+:width: 100%
+:align: center
+```
+
+```{image} ./images/myAdmin_02.png
+:alt: phpmyadmin
+:width: 100%
+:align: center
+```
+
+## Providing WEB based user management to your LDAP Server
+
+1. Install LDAP-Account-Manager with `aptitude install ldap-account-manager`.
+
+2. The LDAP-Account-Manager can be reached with sdi1a.mi.hdm-stuttgart.de/lam.
+
+```{image} ./images/mylam.png
+:alt: phpmyadmin
+:width: 100%
+:align: center
+```
+
+3. The default Master password is "lam". Go to LAM Configuration to change the password.
+
+## Publishing the documentation
+
+We have already published the documantaion in a previous step.
+
+## Publish your documentation
+
+Upload your current HTML documentation to the `/var/www` directory. To make sure that the web server can access the site, you will need to set the appropriate permissions. In our case, it's the `sdidoc` directory:
+```
+chown -R www-data:www-data /var/www/sdidoc
+chmod -R 755 /var/www/sdidoc
+```
+
+Now edit the conf in `/etc/apache2/apache2.conf` and add the path to your HTML documentation:
+
+```
+Alias /g4-doc /var/www/sdidoc/_build/html
+
+<Directory "/var/www/sdidoc/_build/html">
+  Options Indexes FollowSymlinks
+  AllowOverride None
+  Require all granted
+  AddDefaultCharset off
+</Directory>
+```
+After Restarting Apache we can now open our Webiste and add /doc-conf to see our Documentation
+
+Our documentation is stored on Git, and our server clones it for easy access.
 
 
