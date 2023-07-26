@@ -491,7 +491,7 @@ Thanks for using MariaDB!
 
 2. The LDAP-Account-Manager can be reached with sdi1a.mi.hdm-stuttgart.de/lam.
 
-```{image} ./images/mylam.png
+```{image} ./images/lam.png
 :alt: phpmyadmin
 :width: 100%
 :align: center
