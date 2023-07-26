@@ -21,7 +21,7 @@ latest-22.tar.bz2   100%[===================>] 125,32M  59,7MB/s    in 2,1s
 
 
 ```
-3. Extract the downloaded files 
+3. Extract the downloaded files.
 
 ```
 # tar -xvf latest.tar.bz2
@@ -38,7 +38,7 @@ nextcloud/config/config.sample.php
 nextcloud/config/.htaccess
 ```
 
-4. Remove `latest.tar.bz2` with `rm latest.tar.bz2`
+4. Remove `latest.tar.bz2` with `rm latest.tar.bz2`.
 
 
 5. Add permissions to Nextcloud directory.
@@ -66,7 +66,7 @@ Alias /nextcloud "/var/www/nextcloud/"
 </Directory>
 ```
 
-7. Restart apache2
+7. Restart apache2.
 
 8. Go to console and type mySQL and run that SQL to create a new Database:
 
@@ -87,7 +87,7 @@ EXIT;
 ```
 
 
-10. Now it should look like this
+10. Now it should look like this:
 
 ```{image} ./images/nextcloud_02.png
 :alt: Search editor
@@ -98,7 +98,7 @@ EXIT;
 ### Integrate LDAP authentication
 
 
-1. Go to your APPs and activate LDAP user and group backend
+1. Go to your APPs and activate LDAP user and group backend.
 
 ```{image} ./images/nextcloud_03.png
 :alt: Search editor
@@ -106,7 +106,7 @@ EXIT;
 :align: center
 ```
 
-2. Go to Settings and LDAP there you can Integrate the LDAP to authenticate the Users we use `ldap1.hdm-stuttgart.de` for this
+2. Go to Settings and click on LDAP, there you can integrate the LDAP to authenticate the users, we use `ldap1.hdm-stuttgart.de` for this.
 
 ```{image} ./images/nextcloud_04.png
 :alt: Search editor
@@ -120,7 +120,7 @@ EXIT;
 :align: center
 ```
 
-3. Now we can Open NextCloud with our student ID and passwords
+3. Now we can Open NextCloud with our student ID and password.
 
 
 ```{image} ./images/nextcloud_06.png
