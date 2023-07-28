@@ -503,7 +503,7 @@ Thanks for using MariaDB!
 
 Upload your current HTML documentation to the `/var/www` directory. 
 
-There are several ways to do this. In our case, we store our documentation on Git, and our server clones it for easy access. If you don't want to use git, you can also use `rsync`, see [below](###publish-with-rsync ) for more instructions.
+There are several ways to do this. In our case, we store our documentation on Git, and our server clones it for easy access. If you don't want to use git, you can also use `rsync`, see [below](###publish-with-rsync) for more instructions.
 
 To make sure that the web server can access the site, you will need to set the appropriate permissions. In our case, it's the `sdidoc` directory:
 ```
