@@ -500,6 +500,9 @@ Thanks for using MariaDB!
 3. The default Master password is "lam". Go to LAM Configuration to change the password.
 
 ## Publish your documentation
+There are multiple methods you can use to publish your html. Here are two of those methods:
+
+### Publish with Git
 
 Upload your current HTML documentation to the `/var/www` directory. To make sure that the web server can access the site, you will need to set the appropriate permissions. In our case, it's the `sdidoc` directory:
 ```
@@ -522,3 +525,12 @@ Alias /g4-doc /var/www/sdidoc/_build/html
 After Restarting Apache we can now open our Webiste and add /doc-conf to see our Documentation
 
 Our documentation is stored on Git, and our server clones it for easy access.
+
+### Publish with rsync 
+
+If you have a html file on your local device and want to transfer it to the server with `rsync`. Create a new directory on your server to copy the html into. In our case this would be the "doc" directory.
+
+```
+rsync -avz -e ssh C:/Users/gimou/OneDrive/Desktop/index.html root@sdi04a.mi.hdm-stuttgart.de:/var/www/doc
+```
+Note that you must adjust the paths to match your html location and server target directory.
